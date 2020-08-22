@@ -1,4 +1,5 @@
 import argon2 from 'argon2';
+import { EntityManager } from '@mikro-orm/postgresql';
 import { Resolver, Ctx, Mutation, InputType, Field, Arg, Query, ObjectType } from 'type-graphql';
 
 import { User } from '../entities/User';
@@ -47,7 +48,7 @@ export class UserResolver {
   }
 
   @Mutation(() => UserResponse)
-  async register(@Arg('input') input: CredentialsInput, @Ctx() { em }: MyContext): Promise<UserResponse> {
+  async register(@Arg('input') input: CredentialsInput, @Ctx() { em, req }: MyContext): Promise<UserResponse> {
     if (input.username.length <= 2) {
       return {
         errors: [
@@ -64,33 +65,41 @@ export class UserResolver {
         errors: [
           {
             field: 'password',
-            message: 'length must be greater than 3',
+            message: 'length must be greater than 2',
           },
         ],
       };
     }
 
     const hashedPassword = await argon2.hash(input.password);
-    const user = em.create(User, {
-      username: input.username,
-      password: hashedPassword,
-    });
+    let user;
 
     try {
-      await em.persistAndFlush(user);
+      const result = await (em as EntityManager)
+        .createQueryBuilder(User)
+        .getKnexQuery()
+        .insert({
+          username: input.username,
+          password: hashedPassword,
+          created_at: new Date(),
+          updated_at: new Date(),
+        })
+        .returning('*');
+      user = result[0];
     } catch (err) {
-      // duplicate username error
       if (err.code === '23505') {
         return {
           errors: [
             {
               field: 'username',
-              message: 'username has already been taken',
+              message: 'username already taken',
             },
           ],
         };
       }
     }
+
+    req.session.userId = user.id;
 
     return { user };
   }
