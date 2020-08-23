@@ -3,7 +3,7 @@ import { cacheExchange, Cache, QueryInput } from '@urql/exchange-graphcache';
 import { ThemeProvider, CSSReset } from '@chakra-ui/core';
 
 import theme from '../theme';
-import { MeDocument, LoginMutation, MeQuery, RegisterMutation } from '../generated/graphql';
+import { MeQuery, MeDocument, LoginMutation, LogoutMutation, RegisterMutation } from '../generated/graphql';
 
 function betterUpdateQuery<Result, Query>(
   cache: Cache,
@@ -24,27 +24,30 @@ const client = createClient({
     cacheExchange({
       updates: {
         Mutation: {
-          login: (_result, args, cache, info) => {
-            betterUpdateQuery<LoginMutation, MeQuery>(cache, { query: MeDocument }, _result, (result, query) => {
-              if (result.login.errors) {
+          register: (result, _args, cache, _info) => {
+            betterUpdateQuery<RegisterMutation, MeQuery>(cache, { query: MeDocument }, result, (data, query) => {
+              if (data.register.errors) {
                 return query;
               } else {
                 return {
-                  me: result.login.user,
+                  me: data.register.user,
                 };
               }
             });
           },
-          register: (_result, args, cache, info) => {
-            betterUpdateQuery<RegisterMutation, MeQuery>(cache, { query: MeDocument }, _result, (result, query) => {
-              if (result.register.errors) {
+          login: (result, _args, cache, _info) => {
+            betterUpdateQuery<LoginMutation, MeQuery>(cache, { query: MeDocument }, result, (data, query) => {
+              if (data.login.errors) {
                 return query;
               } else {
                 return {
-                  me: result.register.user,
+                  me: data.login.user,
                 };
               }
             });
+          },
+          logout: (result, _args, cache, _info) => {
+            betterUpdateQuery<LogoutMutation, MeQuery>(cache, { query: MeDocument }, result, () => ({ me: null }));
           },
         },
       },
