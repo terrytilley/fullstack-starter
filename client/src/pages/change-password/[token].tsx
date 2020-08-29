@@ -6,7 +6,7 @@ import { NextPage } from 'next';
 import { withUrqlClient } from 'next-urql';
 import { useRouter } from 'next/router';
 import { InputField } from '../../components/InputField';
-import { Wrapper } from '../../components/Wrapper';
+import { Layout } from '../../components/Layout';
 import { useChangePasswordMutation } from '../../generated/graphql';
 import { createUrqlClient } from '../../utils/createUrqlClient';
 import { toErrorMap } from '../../utils/toErrorMap';
@@ -16,7 +16,7 @@ const ChangePassword: NextPage<{ token: string }> = ({ token }) => {
   const [, changePassword] = useChangePasswordMutation();
   const [tokenError, setTokenError] = useState('');
   return (
-    <Wrapper variant="small">
+    <Layout variant="small">
       <Heading as="h1" mb={5}>
         Change Password
       </Heading>
@@ -58,7 +58,7 @@ const ChangePassword: NextPage<{ token: string }> = ({ token }) => {
           </Form>
         )}
       </Formik>
-    </Wrapper>
+    </Layout>
   );
 };
 
