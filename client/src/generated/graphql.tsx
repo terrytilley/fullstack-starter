@@ -17,25 +17,16 @@ export type Scalars = {
 export type Query = {
   __typename?: 'Query';
   hello: Scalars['String'];
-  me?: Maybe<User>;
-  users: Array<User>;
   posts: Array<Post>;
   post?: Maybe<Post>;
+  me?: Maybe<User>;
+  users: Array<User>;
 };
 
 
 export type QueryPostArgs = {
   id: Scalars['Int'];
 };
-
-export type User = {
-  __typename?: 'User';
-  id: Scalars['Int'];
-  createdAt: Scalars['DateTime'];
-  updatedAt: Scalars['DateTime'];
-  username: Scalars['String'];
-};
-
 
 export type Post = {
   __typename?: 'Post';
@@ -45,24 +36,25 @@ export type Post = {
   title: Scalars['String'];
 };
 
+
+export type User = {
+  __typename?: 'User';
+  id: Scalars['Int'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  username: Scalars['String'];
+  email: Scalars['String'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
-  register: UserResponse;
-  login: UserResponse;
-  logout: Scalars['Boolean'];
   createPost: Post;
   updatePost?: Maybe<Post>;
   deletePost: Scalars['Boolean'];
-};
-
-
-export type MutationRegisterArgs = {
-  input: CredentialsInput;
-};
-
-
-export type MutationLoginArgs = {
-  input: CredentialsInput;
+  forgotPassword: Scalars['Boolean'];
+  register: UserResponse;
+  login: UserResponse;
+  logout: Scalars['Boolean'];
 };
 
 
@@ -81,6 +73,22 @@ export type MutationDeletePostArgs = {
   id: Scalars['Int'];
 };
 
+
+export type MutationForgotPasswordArgs = {
+  email: Scalars['String'];
+};
+
+
+export type MutationRegisterArgs = {
+  input: CredentialsInput;
+};
+
+
+export type MutationLoginArgs = {
+  password: Scalars['String'];
+  usernameOrEmail: Scalars['String'];
+};
+
 export type UserResponse = {
   __typename?: 'UserResponse';
   errors?: Maybe<Array<FieldError>>;
@@ -94,6 +102,7 @@ export type FieldError = {
 };
 
 export type CredentialsInput = {
+  email: Scalars['String'];
   username: Scalars['String'];
   password: Scalars['String'];
 };
@@ -104,7 +113,8 @@ export type RegularUserFragment = (
 );
 
 export type LoginMutationVariables = Exact<{
-  input: CredentialsInput;
+  usernameOrEmail: Scalars['String'];
+  password: Scalars['String'];
 }>;
 
 
@@ -178,8 +188,8 @@ export const RegularUserFragmentDoc = gql`
 }
     `;
 export const LoginDocument = gql`
-    mutation Login($input: CredentialsInput!) {
-  login(input: $input) {
+    mutation Login($usernameOrEmail: String!, $password: String!) {
+  login(usernameOrEmail: $usernameOrEmail, password: $password) {
     user {
       ...RegularUser
     }

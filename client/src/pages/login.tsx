@@ -20,9 +20,9 @@ const Login: React.FC<loginProps> = ({}) => {
         Login
       </Heading>
       <Formik
-        initialValues={{ username: '', password: '' }}
+        initialValues={{ usernameOrEmail: '', password: '' }}
         onSubmit={async (input, { setErrors }) => {
-          const response = await login({ input });
+          const response = await login(input);
           if (response.data?.login.errors) {
             setErrors(toErrorMap(response.data.login.errors));
           } else if (response.data?.login.user) {
@@ -33,9 +33,11 @@ const Login: React.FC<loginProps> = ({}) => {
       >
         {({ isSubmitting }) => (
           <Form>
-            <InputField name="username" placeholder="username" label="Username" />
             <Box mt={4}>
-              <InputField name="password" placeholder="password" label="Password" type="password" />
+              <InputField name="usernameOrEmail" placeholder="Username or Email" label="Username or Email" />
+            </Box>
+            <Box mt={4}>
+              <InputField name="password" placeholder="Password" label="Password" type="password" />
             </Box>
             <Button mt={4} type="submit" isLoading={isSubmitting} variantColor="teal">
               Login

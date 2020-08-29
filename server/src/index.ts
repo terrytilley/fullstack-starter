@@ -1,21 +1,22 @@
 import 'reflect-metadata';
+import connectRedis from 'connect-redis';
 import cors from 'cors';
-import redis from 'redis';
 import express from 'express';
 import session from 'express-session';
-import connectRedis from 'connect-redis';
+import redis from 'redis';
+import ormConfig from './mikro-orm.config';
 import { MikroORM } from '@mikro-orm/core';
 import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
-
-import ormConfig from './mikro-orm.config';
-import { __prod__, COOKIE_NAME } from './constants';
+import { COOKIE_NAME, __prod__ } from './constants';
 import { HelloResolver } from './resolvers/hello';
-import { UserResolver } from './resolvers/user';
 import { PostResolver } from './resolvers/post';
+import { UserResolver } from './resolvers/user';
+import { User } from './entities/User';
 
 const main = async () => {
   const orm = await MikroORM.init(ormConfig);
+  await orm.em.nativeDelete(User, {});
   await orm.getMigrator().up();
 
   const port = process.env.PORT || 4000;
