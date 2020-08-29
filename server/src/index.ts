@@ -15,13 +15,14 @@ import { PostResolver } from './resolvers/post';
 import { UserResolver } from './resolvers/user';
 
 const main = async () => {
-  const conn = await createConnection({
+  await createConnection({
     type: 'postgres',
     database: 'fullstack_starter_dev',
     username: 'postgres',
     password: 'postgres',
     logging: true,
     synchronize: true,
+    dropSchema: false,
     entities: [User, Post],
   });
 
