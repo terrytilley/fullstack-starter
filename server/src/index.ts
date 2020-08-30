@@ -1,10 +1,11 @@
 import 'reflect-metadata';
+import { ApolloServer } from 'apollo-server-express';
 import connectRedis from 'connect-redis';
 import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
 import Redis from 'ioredis';
-import { ApolloServer } from 'apollo-server-express';
+import path from 'path';
 import { buildSchema } from 'type-graphql';
 import { createConnection } from 'typeorm';
 import { COOKIE_NAME, __prod__ } from './constants';
@@ -15,7 +16,7 @@ import { PostResolver } from './resolvers/post';
 import { UserResolver } from './resolvers/user';
 
 const main = async () => {
-  await createConnection({
+  const conn = await createConnection({
     type: 'postgres',
     database: 'fullstack_starter_dev',
     username: 'postgres',
@@ -24,7 +25,9 @@ const main = async () => {
     synchronize: true,
     dropSchema: false,
     entities: [User, Post],
+    migrations: [path.join(__dirname, './migrations/*')],
   });
+  await conn.runMigrations();
 
   const port = process.env.PORT || 4000;
   const app = express();
