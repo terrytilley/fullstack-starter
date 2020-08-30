@@ -28,13 +28,13 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
     // user is logged in
   } else {
     body = (
-      <Flex>
-        <Box mr={2}>{data.me.username}</Box>
+      <Flex alignItems="center">
+        <Box mr={4}>{data.me.username}</Box>
         <Button
           onClick={() => {
             logout();
           }}
-          variant="link"
+          variant="solid"
           isLoading={logoutFetching}
         >
           Logout
@@ -44,7 +44,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
   }
 
   return (
-    <Flex zIndex={1} position="sticky" top={0} bg="tan" p={4}>
+    <Flex zIndex={1} position="sticky" top={0} bg="tomato" p={4}>
       <Box ml={'auto'}>{body}</Box>
     </Flex>
   );
