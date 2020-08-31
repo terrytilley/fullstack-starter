@@ -110,7 +110,13 @@ export class PostResolver {
   ): Promise<PaginatedPosts> {
     const maxLimit = Math.min(50, limit);
     const maxLimitPlusOne = maxLimit + 1;
-    const replacements: any[] = [maxLimitPlusOne, req.session.userId];
+    const replacements: any[] = [maxLimitPlusOne];
+
+    if (req.session.userId) {
+      replacements.push(req.session.userId);
+    }
+
+    let cursorIdx = 3;
 
     if (cursor) {
       replacements.push(new Date(parseInt(cursor)));
@@ -133,7 +139,7 @@ export class PostResolver {
       }
       from post p
       inner join public.user u on u.id = p."creatorId"
-      ${cursor ? `where p."createdAt" < $3` : ''}
+      ${cursor ? `where p."createdAt" < $${cursorIdx}` : ''}
       order by p."createdAt" DESC
       limit $1
     `,
