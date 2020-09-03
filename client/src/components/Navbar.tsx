@@ -28,29 +28,36 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
     // user is logged in
   } else {
     body = (
-      <Flex alignItems="center">
-        <Box mr={4}>{data.me.username}</Box>
+      <Flex alignItems="center" align="center">
+        <NextLink href="/create-post">
+          <Button as={Link} variant="link" mr={4}>
+            Create Post
+          </Button>
+        </NextLink>
         <Button
           onClick={() => {
             logout();
           }}
-          variant="solid"
+          variant="link"
           isLoading={logoutFetching}
         >
           Logout
         </Button>
+        <Box ml={4}>{data.me.username}</Box>
       </Flex>
     );
   }
 
   return (
     <Flex zIndex={1} position="sticky" top={0} bg="tomato" p={4} align="center">
-      <NextLink href="/">
-        <Link>
-          <Heading>Logo</Heading>
-        </Link>
-      </NextLink>
-      <Box ml={'auto'}>{body}</Box>
+      <Flex flex={1} m="auto" align="center" maxW={800}>
+        <NextLink href="/">
+          <Link>
+            <Heading>Logo</Heading>
+          </Link>
+        </NextLink>
+        <Box ml={'auto'}>{body}</Box>
+      </Flex>
     </Flex>
   );
 };

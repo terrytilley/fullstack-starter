@@ -4,6 +4,7 @@ import Router from 'next/router';
 import { dedupExchange, Exchange, fetchExchange, stringifyVariables } from 'urql';
 import { pipe, tap } from 'wonka';
 import {
+  DeletePostMutationVariables,
   LoginMutation,
   LogoutMutation,
   MeDocument,
@@ -170,6 +171,12 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
               const fieldInfos = allFields.filter((info) => info.fieldName === 'posts');
               fieldInfos.forEach((fi) => {
                 cache.invalidate('Query', 'posts', fi.arguments || {});
+              });
+            },
+            deletePost: (_result, args, cache, _info) => {
+              cache.invalidate({
+                __typename: 'Post',
+                id: (args as DeletePostMutationVariables).id,
               });
             },
             vote: (_result, args, cache, _info) => {
