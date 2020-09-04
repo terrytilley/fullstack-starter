@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import 'dotenv-safe/config';
 import { ApolloServer } from 'apollo-server-express';
 import connectRedis from 'connect-redis';
 import cors from 'cors';
@@ -21,9 +22,7 @@ import { createUserLoader } from './utils/createUserLoader';
 const main = async () => {
   const conn = await createConnection({
     type: 'postgres',
-    database: 'fullstack_starter_dev',
-    username: 'postgres',
-    password: 'postgres',
+    url: process.env.DATABASE_URL,
     logging: true,
     synchronize: true,
     dropSchema: false,
@@ -32,18 +31,19 @@ const main = async () => {
   });
   await conn.runMigrations();
 
-  const port = process.env.PORT || 4000;
+  const PORT = parseInt(process.env.PORT) || 4000;
   const app = express();
 
   const RedisStore = connectRedis(session);
-  const redis = new Redis();
+  const redis = new Redis(process.env.REDIS_URL);
 
   app.use(
     cors({
-      origin: 'http://localhost:3000',
+      origin: process.env.CORS_ORIGIN,
       credentials: true,
     })
   );
+
   app.use(
     session({
       name: COOKIE_NAME,
@@ -56,8 +56,9 @@ const main = async () => {
         httpOnly: true,
         sameSite: 'lax', // csrf
         secure: __prod__, // cookie only works in https
+        domain: __prod__ ? '.battlerap.io' : undefined,
       },
-      secret: 'superSecret',
+      secret: process.env.SESSION_SECRET,
       resave: false,
       saveUninitialized: false,
     })
@@ -79,8 +80,8 @@ const main = async () => {
 
   apolloServer.applyMiddleware({ app, cors: false });
 
-  app.listen(port, () => {
-    console.log('🚀', `Server started on localhost:${port}`);
+  app.listen(PORT, () => {
+    console.log('🚀', `Server started on localhost:${PORT}`);
   });
 };
 
